@@ -140,7 +140,7 @@ def getCredentials(sessionKey):
 	except Exception, e:
 		raise Exception("Could not get %s credentials from splunk. Error: %s"% (myapp, str(e)))
 
-   for i, c in entities.items(): 
+    for i, c in entities.items(): 
 		if c['eai:acl']['app'] == myapp:
 			return c['username'], c['clear_password']
 
