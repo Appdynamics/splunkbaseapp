@@ -11,6 +11,7 @@ import time
 import datetime
 import splunk.entity as entity
 import splunk,re
+import auth_utils
 
 class Event(threading.Thread):
 
@@ -96,11 +97,11 @@ def handle_exit(sig=None, func=None):
 
 def get_events():
 	conf = ConfigParser()
-	conf.read([os.environ['SPLUNK_HOME'] + '/etc/apps/appdynamics/default/events.conf'])
+	conf.read([os.environ['SPLUNK_HOME'] + '/etc/apps/appdynamics/local/events.conf'])
 	sections = conf.sections()
 	#Getting the password 
-	sessionKey = getSessionKey()
-	username,password = getCredentials(sessionKey)
+	sessionKey = auth_utils.getSessionKey()
+	username,password = auth_utils.getCredentials(sessionKey)
 
 	events = []
 
@@ -121,47 +122,26 @@ def get_events():
 
 	return events
 
-def getSessionKey():
-	# read session key sent from splunkd
-	sk = sys.stdin.readline().strip()
-	sessionKey = re.sub(r'sessionKey=', "", sk)
-
-	if len(sessionKey) == 0:
-		logger.error("Did not receive a session key from splunkd. Please enable passAuth in inputs.conf for this  script\n")
-		sys.exit(2)
-	return sessionKey
-       
-
-def getCredentials(sessionKey):
-	myapp = 'appdynamics'
-	try:
-      # list all credentials
-		entities = entity.getEntities(['admin', 'passwords'], namespace=myapp, owner='nobody', sessionKey=sessionKey) 
-	except Exception, e:
-		raise Exception("Could not get %s credentials from splunk. Error: %s"% (myapp, str(e)))
-
-    for i, c in entities.items(): 
-		if c['eai:acl']['app'] == myapp:
-			return c['username'], c['clear_password']
-
-	raise Exception("No credentials have been found")
 
 if __name__ == '__main__':
 	# Setup logging
-	logger = logging.getLogger('appdynamics_metrics')
+	logger = logging.getLogger('appdynamics_events')
 	logger.propagate = False  # Prevent the log messages from being duplicated in the python.log file
 	logger.setLevel(logging.DEBUG)
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-	fileHandler = logging.handlers.RotatingFileHandler(
-		os.environ['SPLUNK_HOME'] + '/var/log/splunk/appdynamics_metrics.log', maxBytes=25000000, backupCount=5)
+	log_dir = os.environ['SPLUNK_HOME'] + '/var/log/splunk/appdynamics'
+	if not os.path.exists(log_dir)
+		os.makedirs(log_dir)
+
+	fileHandler = logging.handlers.RotatingFileHandler(log_dir + '/events.log', maxBytes=25000000, backupCount=5)
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 	fileHandler.setFormatter(formatter)
 	logger.addHandler(fileHandler)
 	logger.info('AppDynamics Events Grabber started')
 
-	out = logging.getLogger('appdynamics_out')
+	out = logging.getLogger('events_out')
 	formatter = logging.Formatter('%(message)s')
-	handler = logging.handlers.RotatingFileHandler(filename=os.environ['SPLUNK_HOME'] + '/etc/apps/appdynamics/output/events.log', maxBytes=25000000,backupCount=5)
+	handler = logging.handlers.RotatingFileHandler(filename=log_dir + '/events_output.log', maxBytes=25000000,backupCount=5)
 	handler.setFormatter(formatter)
 	out.addHandler(handler)
 	out.setLevel(logging.DEBUG)

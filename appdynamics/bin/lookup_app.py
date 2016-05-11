@@ -33,13 +33,14 @@ def main():
         sys.exit(1)
 
     # Setup logging
-    logger = logging.getLogger('appdynamics_metrics')
+    logger = logging.getLogger('lookup_app')
     logger.propagate = False  # Prevent the log messages from being duplicated in the python.log file
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    fileHandler = logging.handlers.RotatingFileHandler(
-        os.environ['SPLUNK_HOME'] + '/var/log/splunk/appdynamics_metrics.log', maxBytes=25000000, backupCount=5)
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    log_dir = os.environ['SPLUNK_HOME'] + '/var/log/splunk/appdynamics'
+    if not os.path.exists(log_dir)
+        os.makedirs(log_dir)
+    fileHandler = logging.handlers.RotatingFileHandler(log_dir + '/lookup_app.log', maxBytes=25000000, backupCount=5)
     fileHandler.setFormatter(formatter)
     logger.addHandler(fileHandler)
 
@@ -49,12 +50,14 @@ def main():
 
     # read config
     conf = ConfigParser()
-    conf.read([os.environ['SPLUNK_HOME'] + '/etc/apps/appdynamics/default/lookup.conf'])
+    conf.read([os.environ['SPLUNK_HOME'] + '/etc/apps/appdynamics/local/lookup.conf'])
     items = dict(conf.items('Controller'))
     url = items['url']
     url += 'controller/rest/applications'
-    username = items['username']
-    password = items['password']
+    
+    #Getting the password 
+    sessionKey = auth_utils.getSessionKey()
+    username,password = auth_utils.getCredentials(sessionKey)
 
     infile = sys.stdin
     outfile = sys.stdout

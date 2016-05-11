@@ -6,10 +6,9 @@ How To Use the AppDynamics App in Splunk
 [AppDynamics](http://www.appdynamics.com) is an application performance monitoring solution that helps you:
 *Identify problems such as slow and stalled user requests and errors in a production environment.
 *Troubleshoot and isolate the root cause of such problems by: 
-*Mining performance data from AppDynamics into Splunk using the AppDynamics Controller REST API. See Seeing Performance Data from AppDynamics in Splunk. 
+*Mining performance data from AppDynamics and viewing it in Splunk using the AppDynamics Controller REST API. 
 *Pushing notifications on policy violations and events from AppDynamics to Splunk so that a Splunk user can use those to launch deep dives in AppDynamics. See Getting Notifications From and Launching AppDynamics in Splunk.
 
-You can mine application performance monitoring data from AppDynamics using its REST API. You can then process the data within Splunk using Search Processing Language (SPL). 
 
 ##Installation
 
@@ -36,7 +35,7 @@ Links within this file go to AppDynamics 4.2 documentation. If you are running a
 
 ####Steps
 1.  Install the appdynamics app from splunkbase and before restarting perform steps 2 and 3.
-2.  Locate and edit the files: $SPLUNK_HOME/etc/apps/appdynamics/local/metrics.conf and $SPLUNK_HOME/etc/apps/appdynamics/local/events.conf
+2.  Copy the metrics.conf and events.conf from the $SPLUNK_HOME/etc/apps/appdynamics/default directory to $SPLUNK_HOME/etc/apps/appdynamics/local directory. Locate and edit the files: $SPLUNK_HOME/etc/apps/appdynamics/local/metrics.conf and $SPLUNK_HOME/etc/apps/appdynamics/local/events.conf
 3.  In the metrics.conf file, add one section for each individual metric you want to mine from AppDynamics. You need the following:
     -   AppDynamics metric name, to name the section in the metrics.conf file, and for use as as unique identifier in Splunk
     -   REST URL of the metric from the AppDynamics Metric Browser, see the [AppDynamics REST documentation](https://docs.appdynamics.com/display/PRO42/Using+the+Controller+APIs)  (login required).
@@ -44,7 +43,7 @@ Links within this file go to AppDynamics 4.2 documentation. If you are running a
 
     For example, if you want to mine a metric called AverageResponseTime for the ViewCart.sendItems business transaction, the entry would be similar to this:
     
-        [ViewCart.sendItems_AverageResponseTime|ViewCart.sendItems_AverageResponseTime]  
+        [ViewCart.sendItems_AverageResponseTime]  
         url = http://<controller-host>:<port>/controller/rest/applications/Acme%20Online%20Book%20Store/metric-data?metricpath=Business%20Transaction%20Performance%7CBusiness%20Transactions%7CECommerce%7CViewCart.sendItems%7CAverage%20Response%20Time%20(ms)&time-range-type=BEFORE_NOW&duration-in-mins=15  
         interval = 60  
         
@@ -52,7 +51,7 @@ Links within this file go to AppDynamics 4.2 documentation. If you are running a
 4.  In the events.conf file, add one section for each individual event type you want to mine from AppDynamics. You need the following:
     -   AppDynamics event type, to name the section in the events.conf file, specify the event query for the REST URL, and for use as as unique identifier in Splunk
     -   AppDynamics event severity, to specify the event query for the REST URL
-    -   REST URL of the event type from the AppDynamics Metric Browser, see the [AppDynamics REST documentation](http://docs.appdynamics.com/display/PRO13S/Use+the+AppDynamics+REST+API#UsetheAppDynamicsRESTAPI-Retrieveeventdata)  (login required).
+    -   REST URL of the event type from the AppDynamics Metric Browser, see the [AppDynamics REST documentation](https://docs.appdynamics.com/display/PRO42/Alert+and+Respond+API#AlertandRespondAPI-RetrieveEventData)  (login required).
     -   polling interval - how frequently, in seconds, Splunk will run the script to get this metric
 
     For example, if you want to mine events caused by application changes, the entry would look similar to this:
@@ -64,7 +63,11 @@ Links within this file go to AppDynamics 4.2 documentation. If you are running a
 5.  Restart splunk.
 6.  You will be prompted to setup the AppDynamics App. Please click on setup and configure the AppDynamics credentials. Using this view, splunk will store AppDynamics credentials in encrypted mode.
 
-Note: Workaround for an existing Splunk bug. When you make changes to metrics.conf or events.conf, you need to restart Splunk for your changes to take effect. However, when you restart Splunk, it does not properly clean up the running instances of the Python scripts, metrics.py and events.py, which continue to run as zombies. So, after you stop Spunk, if you do a "ps -ef | grep python" and kill all the zombie processes and then restart Splunk, then your changes should be seen immediately.
+Note: Workaround for an existing Splunk bug. When you make changes to metrics.conf or events.conf, you need to restart Splunk for your changes to take effect. However, when you restart Splunk, it does not properly clean up the running instances of the Python scripts, metrics.py and events.py, which continue to run as zombies. So, after you stop Splunk, if you do a "ps -ef | grep python" and kill all the zombie processes and then restart Splunk, then your changes should be seen immediately.
+
+##Splunk Indexes
+For metrics, an index called "appdynamics" is created. 
+For events, an index called "appdynamics_events" is created. 
 
 ##Metrics
 
@@ -100,6 +103,10 @@ Note: Workaround for an existing Splunk bug. When you make changes to metrics.co
 		link.target = blank  
 		link.uri = http://$!nurl$  
 		type = link
+
+##Dependencies
+
+The appdynamics splunkbase app depend on the open source library httplib2.    
     
 ####Custom Notifications in Splunk from AppDynamics
 
