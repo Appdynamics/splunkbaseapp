@@ -100,7 +100,7 @@ def get_events():
 	conf.read([os.environ['SPLUNK_HOME'] + '/etc/apps/appdynamics/local/events.conf'])
 	sections = conf.sections()
 	#Getting the password 
-	sessionKey = auth_utils.getSessionKey()
+	sessionKey = auth_utils.getSessionKey(sys.stdin.readline())
 	username,password = auth_utils.getCredentials(sessionKey)
 
 	events = []
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 	logger.setLevel(logging.DEBUG)
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 	log_dir = os.environ['SPLUNK_HOME'] + '/var/log/splunk/appdynamics'
-	if not os.path.exists(log_dir)
+	if not os.path.exists(log_dir):
 		os.makedirs(log_dir)
 
 	fileHandler = logging.handlers.RotatingFileHandler(log_dir + '/events.log', maxBytes=25000000, backupCount=5)

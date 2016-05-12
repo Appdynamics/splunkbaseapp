@@ -108,7 +108,7 @@ def getMetrics():
 	conf = ConfigParser()
 	conf.read([os.environ['SPLUNK_HOME'] + '/etc/apps/appdynamics/local/metrics.conf'])
 	#Getting the password 
-	sessionKey = auth_utils.getSessionKey()
+	sessionKey = auth_utils.getSessionKey(sys.stdin.readline())
 	username,password = auth_utils.getCredentials(sessionKey)
 	#logger.info("Username and password are %s,%s" % (username,password))
 	sections = conf.sections()
@@ -141,7 +141,7 @@ if __name__ == '__main__':
 	logger.setLevel(logging.DEBUG)
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 	log_dir = os.environ['SPLUNK_HOME'] + '/var/log/splunk/appdynamics'
-	if not os.path.exists(log_dir)
+	if not os.path.exists(log_dir):
 		os.makedirs(log_dir)
 	fileHandler = logging.handlers.RotatingFileHandler(log_dir + '/metrics.log', maxBytes=25000000, backupCount=5)
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')

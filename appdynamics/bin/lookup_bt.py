@@ -38,7 +38,7 @@ def main():
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
     log_dir = os.environ['SPLUNK_HOME'] + '/var/log/splunk/appdynamics'
-    if not os.path.exists(log_dir)
+    if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     fileHandler = logging.handlers.RotatingFileHandler(log_dir + '/lookup_bt.log', maxBytes=25000000, backupCount=5)
     fileHandler.setFormatter(formatter)
@@ -54,7 +54,7 @@ def main():
     items = dict(conf.items('Controller'))
 
     #Getting the password 
-    sessionKey = auth_utils.getSessionKey()
+    sessionKey = auth_utils.getSessionKey(sys.stdin.readline())
     username,password = auth_utils.getCredentials(sessionKey)
 
     infile = sys.stdin

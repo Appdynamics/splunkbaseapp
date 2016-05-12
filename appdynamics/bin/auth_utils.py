@@ -1,9 +1,11 @@
+import os
+import sys
 import splunk.entity as entity
 import splunk,re
 
-def getSessionKey():
+def getSessionKey(sessionKey):
 	# read session key sent from splunkd
-	sk = sys.stdin.readline().strip()
+	sk = sessionKey.strip()
 	sessionKey = re.sub(r'sessionKey=', "", sk)
 
 	if len(sessionKey) == 0:
