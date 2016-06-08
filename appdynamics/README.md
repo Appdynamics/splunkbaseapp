@@ -63,7 +63,6 @@ Links within this file go to AppDynamics 4.2 documentation. If you are running a
 5.  Restart splunk.
 6.  You will be prompted to setup the AppDynamics App. Please click on setup and configure the AppDynamics credentials. Using this view, splunk will store AppDynamics credentials in encrypted mode.
 
-Note: Workaround for an existing Splunk bug. When you make changes to metrics.conf or events.conf, you need to restart Splunk for your changes to take effect. However, when you restart Splunk, it does not properly clean up the running instances of the Python scripts, metrics.py and events.py, which continue to run as zombies. So, after you stop Splunk, if you do a "ps -ef | grep python" and kill all the zombie processes and then restart Splunk, then your changes should be seen immediately.
 
 ##Splunk Indexes
 For metrics, an index called "appdynamics" is created. 
