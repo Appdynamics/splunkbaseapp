@@ -56,6 +56,8 @@ class Event(threading.Thread):
 					for entity in event['affectedEntities']:
 						common_output += '%s_Id=' % entity['entityType']
 						common_output += '%s ' % entity['entityId']
+						common_output += '%s_Name=' % entity['entityType']
+						common_output += '%s ' % entity['name']
 
 					out.debug(common_output)
 			except Exception, e:
@@ -97,7 +99,7 @@ def handle_exit(sig=None, func=None):
 
 def get_events():
 	conf = ConfigParser()
-	conf.read([os.path.join($SPLUNK_HOME,'etc','apps','appdynamics','local','events.conf')])
+	conf.read([os.path.join(os.environ['SPLUNK_HOME'],'etc','apps','appdynamics','default','events.conf')])
 	sections = conf.sections()
 	#Getting the password 
 	sessionKey = auth_utils.getSessionKey(sys.stdin.readline())
@@ -129,11 +131,11 @@ if __name__ == '__main__':
 	logger.propagate = False  # Prevent the log messages from being duplicated in the python.log file
 	logger.setLevel(logging.DEBUG)
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-	log_dir = os.path.join($SPLUNK_HOME,'var','log','splunk','appdynamics')
+	log_dir = os.path.join(os.environ['SPLUNK_HOME'],'var','log','splunk','appdynamics')
 	if not os.path.exists(log_dir):
 		os.makedirs(log_dir)
 
-    fileHandler = logging.handlers.RotatingFileHandler(os.path.join(log_dir,'events.log'), maxBytes=25000000, backupCount=5)
+	fileHandler = logging.handlers.RotatingFileHandler(os.path.join(log_dir,'events.log'), maxBytes=25000000, backupCount=5)
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 	fileHandler.setFormatter(formatter)
 	logger.addHandler(fileHandler)
@@ -145,8 +147,7 @@ if __name__ == '__main__':
 	handler.setFormatter(formatter)
 	out.addHandler(handler)
 	out.setLevel(logging.DEBUG)
-
-    logger.info('AppDynamics Events Grabber started')
+	logger.info('AppDynamics Events Grabber started')
 	events = get_events()
 	for event in events:
 		event.start()

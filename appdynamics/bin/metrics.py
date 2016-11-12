@@ -106,7 +106,7 @@ def handle_exit(sig=None, func=None):
 
 def getMetrics():
 	conf = ConfigParser()
-	conf.read([os.path.join($SPLUNK_HOME,'etc','apps','appdynamics','local','metrics.conf')])
+	conf.read([os.path.join(os.environ['SPLUNK_HOME'],'etc','apps','appdynamics','default','metrics.conf')])
 	#Getting the password 
 	sessionKey = auth_utils.getSessionKey(sys.stdin.readline())
 	username,password = auth_utils.getCredentials(sessionKey)
@@ -140,7 +140,7 @@ if __name__ == '__main__':
 	logger.propagate = False  # Prevent the log messages from being duplicated in the python.log file
 	logger.setLevel(logging.DEBUG)
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-	log_dir = os.path.join($SPLUNK_HOME,'var','log','splunk','appdynamics')
+	log_dir = os.path.join(os.environ['SPLUNK_HOME'],'var','log','splunk','appdynamics')
 	if not os.path.exists(log_dir):
 		os.makedirs(log_dir)
 	fileHandler = logging.handlers.RotatingFileHandler(os.path.join(log_dir,'metrics.log'), maxBytes=25000000, backupCount=5)
@@ -155,8 +155,7 @@ if __name__ == '__main__':
 	handler.setFormatter(formatter)
 	out.addHandler(handler)
 	out.setLevel(logging.DEBUG)
-
-    logger.info('AppDynamics Metrics Grabber is starting')
+	logger.info('AppDynamics Metrics Grabber is starting')
 
 	metrics = getMetrics()
 	for metric in metrics:

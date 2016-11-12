@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+#
+#The lookup_bt.py is no longer needed in 4.2 controller APIs as the Application Name and Business transaction
+#name comes part of the REST apis. Keeping the file to support backward compatibility.
+
 # Copyright (C) 2012 AppDynamics, All Rights Reserved.  Version 3.5
 from ConfigParser import ConfigParser
 import json
@@ -37,7 +41,7 @@ def main():
     logger.propagate = False  # Prevent the log messages from being duplicated in the python.log file
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    log_dir = os.path.join($SPLUNK_HOME,'var','log','splunk','appdynamics')
+    log_dir = os.path.join(os.environ['SPLUNK_HOME'],'var','log','splunk','appdynamics')
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     fileHandler = logging.handlers.RotatingFileHandler(os.path.join(log_dir,'lookup_bt.log'), maxBytes=25000000, backupCount=5)
@@ -50,7 +54,7 @@ def main():
 
     # read config
     conf = ConfigParser()
-    conf.read([os.path.join($SPLUNK_HOME,'etc','apps','appdynamics','local','lookup.conf')])
+    conf.read([os.path.join(os.environ['SPLUNK_HOME'],'etc','apps','appdynamics','default','lookup.conf')])
     items = dict(conf.items('Controller'))
 
     #Getting the password 
