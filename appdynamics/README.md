@@ -35,7 +35,7 @@ Links within this file go to AppDynamics 4.2 documentation. If you are running a
 
 ####Steps
 1.  Install the appdynamics app from splunkbase and before restarting perform steps 2 and 3.
-2.  Copy the metrics.conf and events.conf from the $SPLUNK_HOME/etc/apps/appdynamics/default directory to $SPLUNK_HOME/etc/apps/appdynamics/local directory. Locate and edit the files: $SPLUNK_HOME/etc/apps/appdynamics/local/metrics.conf and $SPLUNK_HOME/etc/apps/appdynamics/local/events.conf
+2.  Locate and edit the files: $SPLUNK_HOME/etc/apps/appdynamics/default/metrics.conf and $SPLUNK_HOME/etc/apps/appdynamics/default/events.conf
 3.  In the metrics.conf file, add one section for each individual metric you want to mine from AppDynamics. You need the following:
     -   AppDynamics metric name, to name the section in the metrics.conf file, and for use as as unique identifier in Splunk
     -   REST URL of the metric from the AppDynamics Metric Browser, see the [AppDynamics REST documentation](https://docs.appdynamics.com/display/PRO42/Using+the+Controller+APIs)  (login required).

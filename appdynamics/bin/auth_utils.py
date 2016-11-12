@@ -14,8 +14,7 @@ def getSessionKey(sessionKey):
 	return sessionKey
        
 
-def getCredentials(sessionKey):
-	myapp = 'appdynamics'
+def getCredentials(sessionKey,myapp='appdynamics'):
 	try:
       # list all credentials
 		entities = entity.getEntities(['admin', 'passwords'], namespace=myapp, owner='nobody', sessionKey=sessionKey) 

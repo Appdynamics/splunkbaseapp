@@ -15,7 +15,7 @@ import auth_utils
 
 def lookup(url, username, password, logger):
     try:
-        myhttp = httplib2.Http(disable_ssl_certificate_validation=True)
+        myhttp = httplib2.Http(timeout=10)
         myhttp.add_credentials(username, password)
         logger.debug('Requesting entities from url: %s' % url)
         response, content = myhttp.request(url, 'GET')
@@ -37,10 +37,10 @@ def main():
     logger.propagate = False  # Prevent the log messages from being duplicated in the python.log file
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    log_dir = os.environ['SPLUNK_HOME'] + '/var/log/splunk/appdynamics'
+    log_dir = os.path.join($SPLUNK_HOME,'var','log','splunk','appdynamics')
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-    fileHandler = logging.handlers.RotatingFileHandler(log_dir + '/lookup_bt.log', maxBytes=25000000, backupCount=5)
+    fileHandler = logging.handlers.RotatingFileHandler(os.path.join(log_dir,'lookup_bt.log'), maxBytes=25000000, backupCount=5)
     fileHandler.setFormatter(formatter)
     logger.addHandler(fileHandler)
 
@@ -50,7 +50,7 @@ def main():
 
     # read config
     conf = ConfigParser()
-    conf.read([os.environ['SPLUNK_HOME'] + '/etc/apps/appdynamics/local/lookup.conf'])
+    conf.read([os.path.join($SPLUNK_HOME,'etc','apps','appdynamics','local','lookup.conf')])
     items = dict(conf.items('Controller'))
 
     #Getting the password 

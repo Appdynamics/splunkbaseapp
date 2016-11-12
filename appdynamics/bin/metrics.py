@@ -29,7 +29,7 @@ class Metric(threading.Thread):
 	def run(self):
 		while not self._event.is_set():
 			try:
-				myhttp = httplib2.Http(disable_ssl_certificate_validation=True)
+				myhttp = httplib2.Http(timeout=10)
 				myhttp.add_credentials(self._username, self._password)
 				url = self._url + '&output=JSON'
 				logger.debug('Requesting metric from url: %s' % url)
@@ -106,7 +106,7 @@ def handle_exit(sig=None, func=None):
 
 def getMetrics():
 	conf = ConfigParser()
-	conf.read([os.environ['SPLUNK_HOME'] + '/etc/apps/appdynamics/local/metrics.conf'])
+	conf.read([os.path.join($SPLUNK_HOME,'etc','apps','appdynamics','local','metrics.conf')])
 	#Getting the password 
 	sessionKey = auth_utils.getSessionKey(sys.stdin.readline())
 	username,password = auth_utils.getCredentials(sessionKey)
@@ -140,27 +140,29 @@ if __name__ == '__main__':
 	logger.propagate = False  # Prevent the log messages from being duplicated in the python.log file
 	logger.setLevel(logging.DEBUG)
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-	log_dir = os.environ['SPLUNK_HOME'] + '/var/log/splunk/appdynamics'
+	log_dir = os.path.join($SPLUNK_HOME,'var','log','splunk','appdynamics')
 	if not os.path.exists(log_dir):
 		os.makedirs(log_dir)
-	fileHandler = logging.handlers.RotatingFileHandler(log_dir + '/metrics.log', maxBytes=25000000, backupCount=5)
+	fileHandler = logging.handlers.RotatingFileHandler(os.path.join(log_dir,'metrics.log'), maxBytes=25000000, backupCount=5)
 	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 	fileHandler.setFormatter(formatter)
 	logger.addHandler(fileHandler)
-	logger.info('AppDynamics Metrics Grabber started')
-
+	
 	out = logging.getLogger('metrics_out')
 	formatter = logging.Formatter('%(message)s')
-	handler = logging.handlers.RotatingFileHandler(filename= log_dir + '/metrics_output.log', maxBytes=25000000,
+	handler = logging.handlers.RotatingFileHandler(os.path.join(log_dir,'metrics_output.log'), maxBytes=25000000,
 		backupCount=5)
 	handler.setFormatter(formatter)
 	out.addHandler(handler)
 	out.setLevel(logging.DEBUG)
 
+    logger.info('AppDynamics Metrics Grabber is starting')
+
 	metrics = getMetrics()
 	for metric in metrics:
 		metric.start()
 
+    
 	set_exit_handler(handle_exit)
 	while True:
 		try:
