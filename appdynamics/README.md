@@ -60,8 +60,10 @@ Links within this file go to AppDynamics 4.2 documentation. If you are running a
         url = http://<controller-host>:<port>/controller/rest/applications/Acme%20Online%20Book%20Store/events?time-range-type=BEFORE_NOW&duration-in-mins=15&event-types=APP_SERVER_RESTART,APPLICATION_CONFIG_CHANGE,APPLICATION_DEPLOYMENT&severities=INFO,WARN,ERROR  
         interval = 60  
 
-5.  Restart splunk.
+5.  Restart splunk. 
 6.  You will be prompted to setup the AppDynamics App. Please click on setup and configure the AppDynamics credentials. Using this view, splunk will store AppDynamics credentials in encrypted mode.
+7.  If you want to add more entries to the events.conf or metrics.conf without restarting splunk, please find the python 
+processes running for metrics.py and events.py and kill them. It will automatically get restarted and it will pick up the new configurations in the conf files.
 
 
 ##Splunk Indexes
@@ -85,12 +87,13 @@ For events, an index called "appdynamics_events" is created.
 
 
 
+
 ####Cross App linking to AppDynamics
 
 1.  Add the following field extraction section to your $SPLUNK_HOME/etc/apps/search/default/props.conf file:
     
 		[source::http-simple]  
-		EXTRACT-AppD = url="http[s]*://(?<nurl>[^"|]+)"
+		EXTRACT-AppD = url="http[s]?:\/\/(?<nurl>[^"|]+)"
     	
 2.  Add the following workflow action to your $SPLUNK_HOME/etc/apps/search/default/workflow_actions.conf file:
     
