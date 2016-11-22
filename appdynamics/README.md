@@ -84,9 +84,29 @@ For events, an index called "appdynamics_events" is created.
 
 ![AppDEventsOnSplunk.PNG](120359)
 
+####Proxy Support
+If the connection to the AppDynamics controller has to go through a proxy, you need to replace the following line
+from the metrics.py and events.py 
 
+myhttp = httplib2.Http(timeout=10)
 
+Replace the above line with
 
+myhttp = httplib2.Http(timeout=10,proxy_info = httplib2.ProxyInfo(httplib2.socks.PROXY_TYPE_HTTP, 'localhost', 8000))
+
+Please make sure to replace 'localhost' and 8000 with the correct proxy settings. 
+
+####SSL Support
+If the connection to the AppDynamics controller is over SSL, you can import the certificates by replacing the following
+line from the metrics.py and events.py
+
+myhttp = httplib2.Http(timeout=10)
+
+Replace the above line with 
+
+myhttp = httplib2.Http(timeout=10,ca_certs = '<path_to_certificate>')
+
+Please make sure to replace '<path_to_certificate>' with the correct path in your environment.
 
 ####Cross App linking to AppDynamics
 
@@ -117,6 +137,7 @@ The appdynamics splunkbase app depend on the open source library httplib2.
 ##Launching AppDynamics from Splunk
 
 On an event in the Splunk Search App, click the blue pulldown and choose Launch in AppDynamics. See the screenshot above.
+
 
 
 ##Contributing
